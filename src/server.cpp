@@ -192,7 +192,6 @@ static void make_response(const Response &resp, std::vector<uint8_t> &out) {
 
 // process 1 request if there is enough data
 static bool try_one_request(Conn *conn) {
-    fprintf(stderr, "try_one_request: incoming size: %zu\n", conn->incoming.size());
     // try to parse the protocol: message header
     if (conn->incoming.size() < 4) {
         return false;   // want read
@@ -214,19 +213,14 @@ static bool try_one_request(Conn *conn) {
     printf("client says: len:%d data:%.*s\n",
         len, len < 100 ? len : 100, request);
 
-    // generate the response (echo)
-fprintf(stderr, "request len: %u\n", len);
+    // application logic: parse the request, generate a response
 std::vector<std::string> cmd;
 if (parse_req(request, len, cmd) < 0) {
-    fprintf(stderr, "parse_req failed\n");
     msg("bad request");
     conn->want_close = true;
     return false;
 }
-fprintf(stderr, "cmd size: %zu\n", cmd.size());
-for (const auto &s : cmd) {
-    fprintf(stderr, "  arg: %s\n", s.c_str());
-}
+
 Response resp;
 do_request(cmd, resp);
 make_response(resp, conn->outgoing); 
