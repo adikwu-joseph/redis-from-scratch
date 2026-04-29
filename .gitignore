@@ -1,3 +1,5 @@
 server
 client
 test_avl
+test_avl
+test_heap
